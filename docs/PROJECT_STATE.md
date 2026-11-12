@@ -29,14 +29,15 @@
 - Added create_provider() to select the deterministic fake provider or OpenAI-compatible provider from environment configuration.
 - Provider selection defaults safely to fake; unsupported names and incomplete real-provider configuration fail explicitly.
 - Added deterministic factory tests and local configuration/security instructions.
-- Android/Termux verification before Phase 1.4: **20 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.38 seconds).
+- Android/Termux verification: **20 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.38 seconds).
 
 ### Phase 1.4 — Application Entry Point
 - Added a composition root that loads an agent manifest, creates the configured provider, initializes SQLite storage, and constructs the runtime.
 - Added a command-line interface and python -m ai_agent_platform entry point.
 - Added an installed ai-agent console-script definition.
 - Added integration tests for complete fake-provider execution and SQLite persistence, plus CLI behavior.
-- See docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md.
+- Android/Termux verification: **22 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.55 seconds).
+- See docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md and docs/PHASE_1_4_VERIFICATION.md.
 
 ## Explicitly not implemented
 - Agent tool calling or a model-controlled decision/action loop.
@@ -51,8 +52,8 @@
 ## Verification status
 - Phase 1 baseline: **7 passed, 0 failed** on Android/Termux.
 - Phase 1.2 expanded suite: **15 passed, 0 failed** on Android/Termux.
-- Phase 1.3 expanded suite: **20 passed, 0 failed** on Android/Termux (Python 3.13.13, pytest 9.2.0).
-- Phase 1.4 integration tests have been added; awaiting execution in the user's Termux environment.
+- Phase 1.3 expanded suite: **20 passed, 0 failed** on Android/Termux.
+- Phase 1.4 expanded suite: **22 passed, 0 failed** on Android/Termux (Python 3.13.13, pytest 9.2.0; 0.55 seconds).
 - The current automated tests use deterministic fake behavior or mocked HTTP responses; no live model request has been made.
 - Never commit or share real API credentials.
 
