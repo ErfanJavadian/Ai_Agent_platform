@@ -19,3 +19,11 @@ class ProviderConfigurationError(AgentPlatformError):
 
 class ProviderRequestError(AgentPlatformError):
     """A model provider request or response failed."""
+
+
+class ToolExecutionError(AgentPlatformError):
+    """A tool call is invalid or could not be completed."""
+
+
+class ToolPermissionError(ToolExecutionError):
+    """An agent attempted to use a tool it is not allowed to use."""

@@ -1,4 +1,4 @@
-"""Small SQLite execution-history repository."""
+"""Small SQLite execution-history and tool-audit repository."""
 
 import sqlite3
 from pathlib import Path
@@ -10,8 +10,6 @@ class SQLiteExecutionStore:
         self.database_path = str(database_path)
         self._memory_connection: sqlite3.Connection | None = None
         if self.database_path == ":memory:":
-            # Keep one connection alive: separate SQLite :memory: connections
-            # each point to a different database.
             self._memory_connection = sqlite3.connect(":memory:")
             self._memory_connection.row_factory = sqlite3.Row
         else:
@@ -38,6 +36,23 @@ class SQLiteExecutionStore:
                     created_at TEXT NOT NULL
                 )
             """)
+            connection.execute("""
+                CREATE TABLE IF NOT EXISTS tool_calls (
+                    call_id TEXT PRIMARY KEY,
+                    execution_id TEXT NOT NULL,
+                    agent_id TEXT NOT NULL,
+                    tool_name TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    arguments_json TEXT NOT NULL,
+                    result_json TEXT,
+                    error TEXT,
+                    created_at TEXT NOT NULL
+                )
+            """)
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_tool_calls_execution "
+                "ON tool_calls(execution_id, created_at)"
+            )
 
     def save(self, *, execution_id: str, agent_id: str, status: str,
              provider: str, task: str, output: str, created_at: str) -> None:
@@ -60,5 +75,30 @@ class SQLiteExecutionStore:
         with self._connect() as connection:
             rows = connection.execute(
                 "SELECT * FROM executions ORDER BY created_at DESC LIMIT ?", (safe_limit,)
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def save_tool_call(
+        self, *, call_id: str, execution_id: str, agent_id: str, tool_name: str,
+        status: str, arguments_json: str, result_json: str | None,
+        error: str | None, created_at: str,
+    ) -> None:
+        with self._connect() as connection:
+            connection.execute("""
+                INSERT INTO tool_calls
+                (call_id, execution_id, agent_id, tool_name, status,
+                 arguments_json, result_json, error, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                call_id, execution_id, agent_id, tool_name, status,
+                arguments_json, result_json, error, created_at,
+            ))
+
+    def list_tool_calls(self, execution_id: str) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT * FROM tool_calls WHERE execution_id = ? "
+                "ORDER BY created_at, rowid",
+                (execution_id,),
             ).fetchall()
         return [dict(row) for row in rows]
