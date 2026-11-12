@@ -23,22 +23,31 @@
 - Runtime configuration is read from environment variables; credentials are not stored in source.
 - Agent instructions, description, task, and optional context are sent to the configured model endpoint.
 - Provider configuration, request handling, and response validation have deterministic offline tests.
-- See `docs/PHASE_1_2_REAL_PROVIDER.md`.
+- Android/Termux verification: **15 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.45 seconds).
+- The provider HTTP tests use mocked responses; no live API request has been made.
+
+### Phase 1.3 — Provider Factory
+- Added create_provider() to select the deterministic fake provider or OpenAI-compatible provider from environment configuration.
+- Provider selection defaults safely to fake; unsupported names and incomplete real-provider configuration fail explicitly.
+- Added deterministic factory tests and local configuration/security instructions.
+- See docs/PHASE_1_3_PROVIDER_FACTORY.md.
 
 ## Explicitly not implemented
-- Automatic provider factory/selection from `AI_AGENT_PROVIDER`; the provider is currently instantiated explicitly.
+- Wiring the provider factory into a public application entry point or CLI.
 - Tool calling, permission-aware tool gateway, or external actions.
 - Agent-to-agent messaging or multi-agent orchestration.
 - Long-term/shared memory or retrieval.
 - Skill registry, installer, or version manager.
 - Secure terminal or code execution.
 - Dashboard, API server, YouTube workflows, or public publishing.
+- Live provider connectivity has not been verified.
 
 ## Verification status
 - Phase 1 baseline: **7 passed, 0 failed** on Android/Termux.
-- Phase 1.2 expanded suite: **15 passed, 0 failed** in 0.45 seconds on Android/Termux using Python 3.13.13 and pytest 9.2.0.
-- The Phase 1.2 provider tests use mocked HTTP responses; no real API request has been made and live provider connectivity is not yet verified.
-- Reproduce with: `python -m pip install -e ".[dev]" && pytest -v`.
+- Phase 1.2 expanded suite: **15 passed, 0 failed** on Android/Termux.
+- Phase 1.3 factory tests are added; awaiting execution in the user's Termux environment.
+- Reproduce with: pytest -v.
+- No real API request has been made. Never commit or share real API credentials.
 
 ## Next milestone
-Add a provider factory that selects FakeProvider or OpenAICompatibleProvider from validated environment configuration, plus a safe local configuration workflow and deterministic tests. Then perform a live API smoke test only if the user has a compatible endpoint and chooses to provide a key locally; never request or commit secrets in chat or Git.
+Run the expanded suite in Termux. If it passes, wire provider creation into a minimal application entry point and add an end-to-end configuration test. Keep live API smoke testing optional and local to the user's device.
