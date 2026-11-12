@@ -39,9 +39,18 @@
 - Android/Termux verification: **22 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.55 seconds).
 - See docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md and docs/PHASE_1_4_VERIFICATION.md.
 
+### Phase 1.5 — Governed Workspace Tools
+- Added a strict tool registry and permission-aware execution gateway.
+- Added workspace-scoped file creation, reading, exact-match editing, and listing.
+- Enforced per-execution tool-call limits, argument-size limits, file-size limits, and strict argument allowlists.
+- Rejected absolute paths, parent traversal, and symbolic links in workspace paths.
+- Added SQLite audit records for successful and failed tool calls.
+- Added tests in tests/test_workspace_tools.py; local Android/Termux verification is pending.
+- See docs/PHASE_1_5_GOVERNED_WORKSPACE_TOOLS.md.
+
 ## Explicitly not implemented
-- Agent tool calling or a model-controlled decision/action loop.
-- Permission-aware tool gateway or external actions.
+- Model-controlled tool selection or a bounded model/tool decision-action loop.
+- External actions and integrations beyond the scoped local workspace tools.
 - Agent-to-agent messaging or multi-agent orchestration.
 - Long-term/shared memory or retrieval.
 - Skill registry, installer, or version manager.
@@ -58,4 +67,4 @@
 - Never commit or share real API credentials.
 
 ## Next milestone
-Add the first governed tool interface and a bounded model/tool execution loop. Start with safe workspace file operations, strict tool schemas, validation, execution limits, and persisted tool-call traces. Do not enable arbitrary host shell execution.
+Connect the OpenAI-compatible provider to the governed tool gateway with a bounded model/tool/result loop. Keep tool permissions explicit and do not enable arbitrary host shell execution.
