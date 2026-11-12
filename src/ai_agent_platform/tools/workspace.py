@@ -37,16 +37,16 @@ class WorkspaceTools:
         if raw.is_absolute() or ".." in raw.parts:
             raise ToolExecutionError("Path must stay inside the workspace")
         candidate = self.root.joinpath(*raw.parts)
-        resolved = candidate.resolve()
-        if not resolved.is_relative_to(self.root):
-            raise ToolExecutionError("Path escapes the workspace")
-        if not allow_root and resolved == self.root:
-            raise ToolExecutionError("A file path is required")
         current = self.root
         for part in raw.parts:
             current = current / part
             if current.is_symlink():
                 raise ToolExecutionError("Symbolic links are not allowed in workspace paths")
+        resolved = candidate.resolve()
+        if not resolved.is_relative_to(self.root):
+            raise ToolExecutionError("Path escapes the workspace")
+        if not allow_root and resolved == self.root:
+            raise ToolExecutionError("A file path is required")
         return resolved
 
     def read_file(self, arguments: dict[str, Any]) -> dict[str, Any]:
