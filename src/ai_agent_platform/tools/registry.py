@@ -1,4 +1,4 @@
-"""Strict tool registration and argument contracts."""
+"""Strict tool registration and provider-compatible argument schemas."""
 
 from dataclasses import dataclass
 from typing import Any, Callable
@@ -16,6 +16,7 @@ class ToolSpec:
     required_arguments: frozenset[str]
     allowed_arguments: frozenset[str]
     handler: ToolHandler
+    parameters: dict[str, Any]
 
 
 class ToolRegistry:
@@ -31,6 +32,8 @@ class ToolRegistry:
             raise ToolExecutionError(f"Tool is already registered: {spec.name}")
         if not spec.required_arguments.issubset(spec.allowed_arguments):
             raise ToolExecutionError("Required tool arguments must be included in allowed arguments")
+        if set(spec.parameters.get("properties", {})) != set(spec.allowed_arguments):
+            raise ToolExecutionError("Tool parameter schema must match allowed arguments")
         self._tools[spec.name] = spec
 
     def get(self, name: str) -> ToolSpec:
@@ -49,3 +52,19 @@ class ToolRegistry:
             }
             for spec in sorted(self._tools.values(), key=lambda item: item.name)
         ]
+
+    def provider_tools(self, allowed_names: tuple[str, ...] | list[str]) -> list[dict[str, Any]]:
+        """Return OpenAI-compatible function declarations for an explicit allowlist."""
+        declarations = []
+        for name in allowed_names:
+            spec = self.get(name)
+            declarations.append({
+                "type": "function",
+                "function": {
+                    "name": spec.name,
+                    "description": spec.description,
+                    "parameters": spec.parameters,
+                    "strict": True,
+                },
+            })
+        return declarations

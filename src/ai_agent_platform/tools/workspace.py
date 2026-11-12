@@ -71,27 +71,21 @@ class WorkspaceTools:
             raise ToolExecutionError("Content exceeds the configured file size limit")
         path = self._resolve(relative_path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        # Re-check after creating parent directories to catch pre-existing symlinks.
         path = self._resolve(relative_path)
         if path.exists() and not path.is_file():
             raise ToolExecutionError("Target path is not a regular file")
         path.write_text(content, encoding="utf-8")
-        return {
-            "relative_path": path.relative_to(self.root).as_posix(),
-            "bytes_written": size,
-        }
+        return {"relative_path": path.relative_to(self.root).as_posix(), "bytes_written": size}
 
     def list_files(self, arguments: dict[str, Any]) -> dict[str, Any]:
-        relative_path = arguments.get("relative_path", ".")
-        directory = self._resolve(relative_path, allow_root=True)
+        directory = self._resolve(arguments.get("relative_path", "."), allow_root=True)
         if not directory.is_dir():
             raise ToolExecutionError("Requested workspace directory does not exist")
         found: list[str] = []
         for current, directories, filenames in os.walk(directory, followlinks=False):
             current_path = Path(current)
             directories[:] = sorted(
-                name for name in directories
-                if not (current_path / name).is_symlink()
+                name for name in directories if not (current_path / name).is_symlink()
             )
             for filename in sorted(filenames):
                 candidate = current_path / filename
@@ -103,10 +97,7 @@ class WorkspaceTools:
         return {"files": found, "truncated": False}
 
 
-def register_workspace_tools(
-    registry: ToolRegistry,
-    workspace: WorkspaceTools,
-) -> None:
+def register_workspace_tools(registry: ToolRegistry, workspace: WorkspaceTools) -> None:
     """Register the four built-in workspace operations."""
     registry.register(ToolSpec(
         name="workspace_read_file",
@@ -114,6 +105,7 @@ def register_workspace_tools(
         required_arguments=frozenset({"relative_path"}),
         allowed_arguments=frozenset({"relative_path"}),
         handler=workspace.read_file,
+        parameters={"type":"object","properties":{"relative_path":{"type":"string"}},"required":["relative_path"],"additionalProperties":False},
     ))
     registry.register(ToolSpec(
         name="workspace_write_file",
@@ -121,6 +113,7 @@ def register_workspace_tools(
         required_arguments=frozenset({"relative_path", "content"}),
         allowed_arguments=frozenset({"relative_path", "content"}),
         handler=workspace.write_file,
+        parameters={"type":"object","properties":{"relative_path":{"type":"string"},"content":{"type":"string"}},"required":["relative_path","content"],"additionalProperties":False},
     ))
     registry.register(ToolSpec(
         name="workspace_list_files",
@@ -128,6 +121,7 @@ def register_workspace_tools(
         required_arguments=frozenset(),
         allowed_arguments=frozenset({"relative_path"}),
         handler=workspace.list_files,
+        parameters={"type":"object","properties":{"relative_path":{"type":"string"}},"required":[],"additionalProperties":False},
     ))
     registry.register(ToolSpec(
         name="workspace_edit_file",
@@ -135,25 +129,21 @@ def register_workspace_tools(
         required_arguments=frozenset({"relative_path", "old_text", "new_text"}),
         allowed_arguments=frozenset({"relative_path", "old_text", "new_text"}),
         handler=lambda args: _edit_file(workspace, args),
+        parameters={"type":"object","properties":{"relative_path":{"type":"string"},"old_text":{"type":"string"},"new_text":{"type":"string"}},"required":["relative_path","old_text","new_text"],"additionalProperties":False},
     ))
 
 
 def _edit_file(workspace: WorkspaceTools, arguments: dict[str, Any]) -> dict[str, Any]:
-    old_text = arguments["old_text"]
-    new_text = arguments["new_text"]
+    old_text, new_text = arguments["old_text"], arguments["new_text"]
     if not isinstance(old_text, str) or not old_text:
         raise ToolExecutionError("old_text must be a non-empty string")
     if not isinstance(new_text, str):
         raise ToolExecutionError("new_text must be a string")
     existing = workspace.read_file({"relative_path": arguments["relative_path"]})
-    content = existing["content"]
-    occurrences = content.count(old_text)
+    occurrences = existing["content"].count(old_text)
     if occurrences != 1:
-        raise ToolExecutionError(
-            f"Edit requires exactly one match; found {occurrences}"
-        )
-    updated = content.replace(old_text, new_text, 1)
+        raise ToolExecutionError(f"Edit requires exactly one match; found {occurrences}")
     return workspace.write_file({
         "relative_path": arguments["relative_path"],
-        "content": updated,
+        "content": existing["content"].replace(old_text, new_text, 1),
     })

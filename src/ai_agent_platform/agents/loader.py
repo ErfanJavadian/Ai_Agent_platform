@@ -27,12 +27,20 @@ def parse_agent_definition(data: dict[str, Any]) -> AgentDefinition:
     version = data.get("version", "1.0.0")
     if not isinstance(version, str) or not version.strip():
         raise AgentDefinitionError("'version' must be a non-empty string")
+    allowed_tools = data.get("allowed_tools", [])
+    if (
+        not isinstance(allowed_tools, list)
+        or any(not isinstance(item, str) or not item.strip() for item in allowed_tools)
+        or len(set(allowed_tools)) != len(allowed_tools)
+    ):
+        raise AgentDefinitionError("'allowed_tools' must be a list of unique non-empty strings")
     return AgentDefinition(
         agent_id=agent_id,
         name=_required_string(data, "name"),
         description=_required_string(data, "description"),
         instructions=_required_string(data, "instructions"),
         version=version.strip(),
+        allowed_tools=tuple(allowed_tools),
     )
 
 

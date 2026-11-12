@@ -2,10 +2,7 @@
 
 An extensible, execution-oriented multi-agent organization and AI Company Builder.
 
-> Status: Phase 1.5. The platform now has a permission-aware tool gateway and workspace-scoped file operations with SQLite audit records. Model-controlled tool selection and the autonomous action loop are the next milestone.
-
-## Product direction
-The platform will let users create specialized agents, attach reusable skills and approved tools, organize agents into teams, and delegate real projects. Agents will collaborate through governed messaging, use scoped memory, and execute code in isolated project workspaces.
+> Status: Phase 1.6. The runtime can now pass approved workspace tools to a compatible model, execute selected tool calls, return results, and continue within bounded limits.
 
 ## Architecture documents
 - [Product vision](docs/PRODUCT_VISION.md)
@@ -18,45 +15,38 @@ The platform will let users create specialized agents, attach reusable skills an
 - [Roadmap](docs/ROADMAP.md)
 - [Project state](docs/PROJECT_STATE.md)
 - [ADR-0001: Runtime and storage](docs/DECISIONS/ADR-0001-runtime-and-storage.md)
-- [Phase 1 runtime guide](docs/PHASE_1_RUNTIME.md)
 - [Phase 1.2 real provider](docs/PHASE_1_2_REAL_PROVIDER.md)
 - [Phase 1.3 provider factory](docs/PHASE_1_3_PROVIDER_FACTORY.md)
 - [Phase 1.4 application entry point](docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md)
 - [Phase 1.5 governed workspace tools](docs/PHASE_1_5_GOVERNED_WORKSPACE_TOOLS.md)
+- [Phase 1.6 model/tool loop](docs/PHASE_1_6_MODEL_TOOL_LOOP.md)
 
-## Implemented foundation
-- Validated JSON agent definitions.
-- Typed request and response models.
-- Provider protocol with deterministic offline FakeProvider.
-- OpenAI-compatible Chat Completions adapter.
-- Environment-driven provider factory.
-- Single-agent execution lifecycle.
-- SQLite execution history and tool-call audit records.
-- Python application composition root and CLI.
+## Implemented
+- Validated JSON agent manifests with explicit per-agent tool allowlists.
+- Deterministic offline FakeProvider and OpenAI-compatible Chat Completions adapter.
+- Model-controlled function/tool call parsing and bounded tool/result loop.
 - Permission-aware tool registry and gateway.
 - Workspace file creation, reading, exact-match editing, and listing.
-- Automated tests for application wiring, CLI, tool permissions, path boundaries, and audit persistence.
+- SQLite execution history and tool-call audit records.
+- CLI application entry point and automated tests.
 
 ## Local setup
-Requires Python 3.11 or newer. Install the project in editable mode with development dependencies:
-
-~~~
+Requires Python 3.11 or newer:
+~~~bash
 pip install -e ".[dev]"
+pytest -v
 ~~~
 
-Run the default example agent:
-
-~~~
+Default deterministic example:
+~~~bash
 python -m ai_agent_platform run --task "Create a short project plan"
 ~~~
 
-## Engineering principles
-1. Build real, testable capabilities, not role-play demonstrations.
-2. This repository is the sole canonical project workspace.
-3. Enforce permissions in runtime code, not only in prompts.
-4. Treat model output, skills, retrieved content, and tool output as untrusted.
-5. Require approval for consequential external actions.
-6. Keep model providers and infrastructure behind replaceable interfaces.
-7. Prefer low-cost, local-first development until scale requires otherwise.
+Real-model builder example:
+~~~bash
+python -m ai_agent_platform run --agent examples/agents/builder.json --task "Create a simple landing page with index.html and styles.css"
+~~~
 
-No software license has been selected. Do not assume this repository is open-source licensed.
+Configure `AI_AGENT_PROVIDER=openai_compatible`, `AI_AGENT_API_KEY`, and `AI_AGENT_MODEL` in the local shell before the real-model example. Do not commit API keys.
+
+No arbitrary shell execution or external side effects are enabled. The workspace path boundary is not a hardened OS sandbox. No software license has been selected.
