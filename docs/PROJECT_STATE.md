@@ -35,10 +35,10 @@
 - Dashboard, API server, YouTube workflows, or public publishing.
 
 ## Verification status
-- Phase 1 test suite was executed on Android/Termux: **7 passed**.
-- Phase 1.2 tests have been added but must be run in the user's Termux environment before claiming they pass.
-- Run all tests with: `python -m pip install -e ".[dev]" && pytest -v`.
-- No real API request has been made as part of implementation. The provider tests use mocked HTTP responses.
+- Phase 1 baseline: **7 passed, 0 failed** on Android/Termux.
+- Phase 1.2 expanded suite: **15 passed, 0 failed** in 0.45 seconds on Android/Termux using Python 3.13.13 and pytest 9.2.0.
+- The Phase 1.2 provider tests use mocked HTTP responses; no real API request has been made and live provider connectivity is not yet verified.
+- Reproduce with: `python -m pip install -e ".[dev]" && pytest -v`.
 
 ## Next milestone
-Run the expanded test suite in Termux. After verification, add provider factory/selection and a safe local configuration workflow. Keep real credentials out of Git.
+Add a provider factory that selects FakeProvider or OpenAICompatibleProvider from validated environment configuration, plus a safe local configuration workflow and deterministic tests. Then perform a live API smoke test only if the user has a compatible endpoint and chooses to provide a key locally; never request or commit secrets in chat or Git.
