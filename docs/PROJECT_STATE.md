@@ -27,9 +27,12 @@
 - Dashboard, API server, YouTube workflows, or public publishing.
 
 ## Verification status
-- Source and test files have been committed to GitHub.
-- Tests have **not** been executed in a Python environment as part of this GitHub-only change.
-- Run locally with Python 3.11+: `python -m pip install -e ".[dev]" && pytest`.
+- Source and test files are committed to GitHub.
+- The full automated test suite was executed successfully on Android using Termux.
+- Environment: Python 3.13.13, pytest 9.2.0.
+- Result: **7 passed, 0 failed** in 0.53 seconds.
+- Verified coverage: agent manifest loading and validation, runtime execution and persistence, in-memory SQLite persistence, empty-task rejection, and oversized-task rejection.
+- Reproduce with: `python -m pip install -e ".[dev]" && pytest -v`.
 
 ## Next milestone
-Run the automated test suite in a Python 3.11+ environment, fix any failures, then add the first real model-provider adapter behind the existing provider protocol. Keep real credentials out of Git.
+Add the first real model-provider adapter behind the existing provider protocol, with configuration through environment variables and no committed credentials. Then add deterministic tests for provider configuration and error handling. Keep real credentials out of Git.
