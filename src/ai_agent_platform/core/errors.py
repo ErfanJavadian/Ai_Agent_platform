@@ -11,3 +11,11 @@ class AgentDefinitionError(AgentPlatformError):
 
 class AgentExecutionError(AgentPlatformError):
     """An agent execution could not be completed."""
+
+
+class ProviderConfigurationError(AgentPlatformError):
+    """A model provider is missing or has invalid configuration."""
+
+
+class ProviderRequestError(AgentPlatformError):
+    """A model provider request or response failed."""
