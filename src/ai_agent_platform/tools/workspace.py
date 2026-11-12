@@ -121,7 +121,7 @@ def register_workspace_tools(registry: ToolRegistry, workspace: WorkspaceTools) 
         required_arguments=frozenset(),
         allowed_arguments=frozenset({"relative_path"}),
         handler=workspace.list_files,
-        parameters={"type":"object","properties":{"relative_path":{"type":"string"}},"required":[],"additionalProperties":False},
+        parameters={"type":"object","properties":{"relative_path":{"type":"string"}},"required":["relative_path"],"additionalProperties":False},
     ))
     registry.register(ToolSpec(
         name="workspace_edit_file",
