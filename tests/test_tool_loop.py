@@ -25,11 +25,11 @@ class ScriptedProvider:
         return self.turns.pop(0)
 
 
-def make_runtime(tmp_path, provider, *, max_model_turns=4):
+def make_runtime(tmp_path, provider, *, max_model_turns=4, allowed_tools=None):
     agent = parse_agent_definition({
         "agent_id": "builder", "name": "Builder", "description": "Test builder",
         "instructions": "Build files safely.",
-        "allowed_tools": ["workspace_write_file", "workspace_read_file"],
+        "allowed_tools": allowed_tools if allowed_tools is not None else ["workspace_write_file", "workspace_read_file"],
     })
     store = SQLiteExecutionStore(tmp_path / "history.sqlite3")
     workspace = WorkspaceTools(tmp_path / "workspace")
@@ -74,7 +74,9 @@ def test_model_cannot_call_tool_outside_agent_allowlist(tmp_path):
         )),
         ProviderTurn(content="The operation was denied."),
     ])
-    agent, runtime, workspace, store = make_runtime(tmp_path, provider)
+    agent, runtime, workspace, store = make_runtime(
+        tmp_path, provider, allowed_tools=["workspace_read_file"]
+    )
     response = runtime.run(agent, AgentRequest("Do something"))
     assert not (workspace.root / "blocked.txt").exists()
     trace = store.list_tool_calls(response.execution_id)

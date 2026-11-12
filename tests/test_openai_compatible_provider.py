@@ -119,8 +119,6 @@ def test_provider_parses_tool_calls_and_sends_tool_schemas(monkeypatch):
         return FakeHTTPResponse()
     monkeypatch.setattr("ai_agent_platform.providers.openai_compatible.urlopen", fake_urlopen)
     provider = OpenAICompatibleProvider(api_key="secret", model="tool-model")
-    from ai_agent_platform.core.models import AgentRequest
-    from ai_agent_platform.providers.openai_compatible import OpenAICompatibleProvider
     tools = [{"type":"function","function":{"name":"workspace_write_file","description":"write","parameters":{
         "type":"object","properties":{"relative_path":{"type":"string"},"content":{"type":"string"}},
         "required":["relative_path","content"],"additionalProperties":False
