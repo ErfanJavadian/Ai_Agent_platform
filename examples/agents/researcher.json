@@ -1,0 +1,7 @@
+{
+  "agent_id": "researcher",
+  "name": "Research Agent",
+  "description": "A starter agent definition for testing the runtime.",
+  "version": "1.0.0",
+  "instructions": "Analyze the assigned research task, separate facts from assumptions, and return a concise structured summary."
+}

@@ -1,31 +1,35 @@
 # Project state
 
-## Repository baseline verified before Foundation changes
+## Repository
 - Repository: ErfanJavadian/Ai_Agent_platform
 - Default branch: main
-- Visibility: public
-- Previous branch head: 7efabca3ad67b136dc5494ee9fca59571aef350c
-- Previous root content: README.md only
-- Existing README was inspected and expanded, not discarded.
 
-## Current milestone
-Phase 0 — Foundation documentation baseline.
+## Completed milestones
+### Phase 0 — Foundation
+- Product vision, organization charter, architecture, communication protocol, orchestration specification, agent/skill studio specification, terminal security specification, roadmap, and ADR-0001 documented.
 
-The product vision, organization model, architecture overview, communication protocol, orchestration specification, agent/skill specification, terminal security requirements, and roadmap are documented.
+### Phase 1 — Minimal Agent Runtime (initial implementation)
+- Python package skeleton and project metadata created.
+- JSON agent manifest loader and validation implemented.
+- Typed agent/request/response domain models implemented.
+- Provider protocol and deterministic FakeProvider implemented.
+- Single-agent runtime with input/output validation implemented.
+- SQLite execution-history persistence implemented.
+- Automated test files added for loader, runtime, persistence, and input validation.
 
-## Not implemented yet
-These are specifications, not working features:
-- Agent runtime and model-provider integration.
-- Task database and orchestration engine.
-- Live agent-to-agent message bus.
-- Custom agent builder and skill loader.
-- Tool gateway and permission enforcement.
-- Isolated terminal execution.
-- Dashboard and external platform integrations.
-- YouTube content generation or publishing agents.
+## Explicitly not implemented
+- Real LLM provider integration; FakeProvider is not an AI model.
+- Tool calling, permission-aware tool gateway, or external actions.
+- Agent-to-agent messaging or multi-agent orchestration.
+- Long-term/shared memory or retrieval.
+- Skill registry, installer, or version manager.
+- Secure terminal or code execution.
+- Dashboard, API server, YouTube workflows, or public publishing.
+
+## Verification status
+- Source and test files have been committed to GitHub.
+- Tests have **not** been executed in a Python environment as part of this GitHub-only change.
+- Run locally with Python 3.11+: `python -m pip install -e ".[dev]" && pytest`.
 
 ## Next milestone
-Implement a minimal Python project skeleton and deterministic tests, then build a single-agent runtime before multi-agent concurrency. The first runtime should work without a paid model API by providing a deterministic test adapter.
-
-## Progress reporting
-Update this file at every milestone. State what was implemented, how it was tested, what remains incomplete, and the exact next step. Never mark a specification as implemented software.
+Run the automated test suite in a Python 3.11+ environment, fix any failures, then add the first real model-provider adapter behind the existing provider protocol. Keep real credentials out of Git.
