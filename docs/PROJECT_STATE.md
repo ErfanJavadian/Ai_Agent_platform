@@ -13,9 +13,8 @@
 - JSON agent manifest loader and validation implemented.
 - Typed agent/request/response domain models implemented.
 - Provider protocol and deterministic FakeProvider implemented.
-- Single-agent runtime with input/output validation implemented.
+- Single-agent execution runtime with input/output validation implemented.
 - SQLite execution-history persistence implemented.
-- Automated tests added for loader, runtime, persistence, and input validation.
 - Android/Termux verification: **7 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0).
 
 ### Phase 1.2 — Real Model Provider Adapter
@@ -30,12 +29,18 @@
 - Added create_provider() to select the deterministic fake provider or OpenAI-compatible provider from environment configuration.
 - Provider selection defaults safely to fake; unsupported names and incomplete real-provider configuration fail explicitly.
 - Added deterministic factory tests and local configuration/security instructions.
-- Android/Termux verification: **20 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.38 seconds).
-- See docs/PHASE_1_3_PROVIDER_FACTORY.md and docs/PHASE_1_3_VERIFICATION.md.
+- Android/Termux verification before Phase 1.4: **20 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.38 seconds).
+
+### Phase 1.4 — Application Entry Point
+- Added a composition root that loads an agent manifest, creates the configured provider, initializes SQLite storage, and constructs the runtime.
+- Added a command-line interface and python -m ai_agent_platform entry point.
+- Added an installed ai-agent console-script definition.
+- Added integration tests for complete fake-provider execution and SQLite persistence, plus CLI behavior.
+- See docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md.
 
 ## Explicitly not implemented
-- Wiring the provider factory into a public application entry point or CLI.
-- Tool calling, permission-aware tool gateway, or external actions.
+- Agent tool calling or a model-controlled decision/action loop.
+- Permission-aware tool gateway or external actions.
 - Agent-to-agent messaging or multi-agent orchestration.
 - Long-term/shared memory or retrieval.
 - Skill registry, installer, or version manager.
@@ -47,9 +52,9 @@
 - Phase 1 baseline: **7 passed, 0 failed** on Android/Termux.
 - Phase 1.2 expanded suite: **15 passed, 0 failed** on Android/Termux.
 - Phase 1.3 expanded suite: **20 passed, 0 failed** on Android/Termux (Python 3.13.13, pytest 9.2.0).
-- No real API request has been made. Tests use deterministic local behavior and mocked HTTP responses; live credentials and model connectivity remain unverified.
-- Reproduce with: pytest -v.
+- Phase 1.4 integration tests have been added; awaiting execution in the user's Termux environment.
+- The current automated tests use deterministic fake behavior or mocked HTTP responses; no live model request has been made.
 - Never commit or share real API credentials.
 
 ## Next milestone
-Wire provider creation into a minimal application entry point so the runtime can be started through a single supported interface. Add end-to-end tests proving provider selection, agent loading, execution, and persistence work together. Keep live API smoke testing optional and local to the user's device.
+Add the first governed tool interface and a bounded model/tool execution loop. Start with safe workspace file operations, strict tool schemas, validation, execution limits, and persisted tool-call traces. Do not enable arbitrary host shell execution.

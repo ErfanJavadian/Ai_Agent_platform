@@ -2,7 +2,7 @@
 
 An extensible, execution-oriented multi-agent organization and AI Company Builder.
 
-> Status: Phase 1 initial implementation. A deterministic single-agent runtime and SQLite execution history are implemented. The default provider is a test double, not a real LLM.
+> Status: Phase 1.4. A local application entry point now connects an agent manifest, provider factory, single-agent runtime, and SQLite execution history. The default provider remains a deterministic test double, not a real LLM.
 
 ## Product direction
 The platform will let users create specialized agents, attach reusable skills and approved tools, organize agents into teams, and delegate real projects. Agents will collaborate through governed messaging, use scoped memory, and execute code in isolated project workspaces.
@@ -19,17 +19,33 @@ The platform will let users create specialized agents, attach reusable skills an
 - [Project state](docs/PROJECT_STATE.md)
 - [ADR-0001: Runtime and storage](docs/DECISIONS/ADR-0001-runtime-and-storage.md)
 - [Phase 1 runtime guide](docs/PHASE_1_RUNTIME.md)
+- [Phase 1.2 real provider](docs/PHASE_1_2_REAL_PROVIDER.md)
+- [Phase 1.3 provider factory](docs/PHASE_1_3_PROVIDER_FACTORY.md)
+- [Phase 1.4 application entry point](docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md)
 
 ## Implemented foundation
 - Validated JSON agent definitions.
 - Typed request and response models.
-- Provider interface with deterministic offline FakeProvider.
+- Provider protocol with deterministic offline FakeProvider.
+- OpenAI-compatible Chat Completions adapter.
+- Environment-driven provider factory.
 - Single-agent execution lifecycle.
 - SQLite execution history.
-- Automated tests added; execution status is recorded in project state.
+- Python application composition root and CLI (python -m ai_agent_platform run ...).
+- Automated integration tests for application wiring and CLI execution.
 
 ## Local setup
-Requires Python 3.11 or newer. See [Phase 1 runtime guide](docs/PHASE_1_RUNTIME.md).
+Requires Python 3.11 or newer. Install the project in editable mode with development dependencies:
+
+~~~bash
+pip install -e ".[dev]"
+~~~
+
+Run the default example agent:
+
+~~~bash
+python -m ai_agent_platform run --task "Create a short project plan"
+~~~
 
 ## Engineering principles
 1. Build real, testable capabilities, not role-play demonstrations.
