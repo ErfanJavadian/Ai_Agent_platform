@@ -24,6 +24,13 @@ def test_runtime_executes_and_persists_result(tmp_path):
     assert saved["status"] == "completed"
 
 
+def test_in_memory_store_keeps_schema_and_records_between_operations():
+    store = SQLiteExecutionStore(":memory:")
+    store.save(execution_id="exec-1", agent_id="researcher", status="completed",
+               provider="fake", task="test", output="result", created_at="2026-01-01")
+    assert store.get("exec-1")["output"] == "result"
+
+
 def test_runtime_rejects_empty_task(tmp_path):
     runtime, _ = make_runtime(tmp_path)
     agent = load_agent("examples/agents/researcher.json")

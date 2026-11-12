@@ -8,11 +8,19 @@ from typing import Any
 class SQLiteExecutionStore:
     def __init__(self, database_path: str | Path = "data/agent_platform.sqlite3"):
         self.database_path = str(database_path)
-        if self.database_path != ":memory:":
+        self._memory_connection: sqlite3.Connection | None = None
+        if self.database_path == ":memory:":
+            # Keep one connection alive: separate SQLite :memory: connections
+            # each point to a different database.
+            self._memory_connection = sqlite3.connect(":memory:")
+            self._memory_connection.row_factory = sqlite3.Row
+        else:
             Path(self.database_path).parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
 
     def _connect(self) -> sqlite3.Connection:
+        if self._memory_connection is not None:
+            return self._memory_connection
         connection = sqlite3.connect(self.database_path)
         connection.row_factory = sqlite3.Row
         return connection
