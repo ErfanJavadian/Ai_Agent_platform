@@ -20,6 +20,7 @@ An extensible, execution-oriented multi-agent organization and AI Company Builde
 - [Phase 1.4 application entry point](docs/PHASE_1_4_APPLICATION_ENTRY_POINT.md)
 - [Phase 1.5 governed workspace tools](docs/PHASE_1_5_GOVERNED_WORKSPACE_TOOLS.md)
 - [Phase 1.6 model/tool loop](docs/PHASE_1_6_MODEL_TOOL_LOOP.md)
+- [Phase 1.7 execution failure persistence](docs/PHASE_1_7_EXECUTION_FAILURE_PERSISTENCE.md)
 
 ## Implemented
 - Validated JSON agent manifests with explicit per-agent tool allowlists.
