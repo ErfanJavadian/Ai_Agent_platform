@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Platform Engineer"
+  short_description: "Build, test, and secure the AI Agent Platform"
+  default_prompt: "Use $ai-agent-platform-engineering to implement the next tested vertical slice in this repository."
