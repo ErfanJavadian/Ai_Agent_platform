@@ -97,3 +97,8 @@ def test_tool_loop_stops_at_model_turn_limit(tmp_path):
     agent, runtime, _, _ = make_runtime(tmp_path, provider, max_model_turns=2)
     with pytest.raises(AgentExecutionError, match="tool-loop limit"):
         runtime.run(agent, AgentRequest("Keep creating files"))
+
+    failed_runs = store.list_recent()
+    assert len(failed_runs) == 1
+    assert failed_runs[0]["status"] == "failed"
+    assert "tool-loop limit" in failed_runs[0]["error"]

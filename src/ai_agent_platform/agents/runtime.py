@@ -64,6 +64,23 @@ class AgentRuntime:
             f"Model reached the {self.max_model_turns}-turn tool-loop limit without a final answer"
         )
 
+    def _persist_failure(
+        self, *, execution_id: str, agent: AgentDefinition, request: AgentRequest,
+        created_at: str, error: Exception,
+    ) -> None:
+        error_text = f"{type(error).__name__}: {error}"[:2_000]
+        try:
+            self.store.save(
+                execution_id=execution_id, agent_id=agent.agent_id,
+                status="failed", provider=self.provider.name,
+                task=request.task, output="", error=error_text, created_at=created_at,
+            )
+        except Exception as persistence_error:
+            raise AgentExecutionError(
+                "Agent execution failed and its failure record could not be persisted "
+                f"({type(persistence_error).__name__})"
+            ) from error
+
     def run(self, agent: AgentDefinition, request: AgentRequest) -> AgentResponse:
         if not isinstance(request.task, str) or not request.task.strip():
             raise AgentExecutionError("Task must be a non-empty string")
@@ -81,10 +98,19 @@ class AgentRuntime:
                 status="completed", provider=self.provider.name,
                 task=request.task, output=output, created_at=created_at,
             )
-        except AgentExecutionError:
+        except AgentExecutionError as exc:
+            self._persist_failure(
+                execution_id=execution_id, agent=agent, request=request,
+                created_at=created_at, error=exc,
+            )
             raise
         except Exception as exc:
-            raise AgentExecutionError(f"Agent execution failed: {exc}") from exc
+            failure = AgentExecutionError(f"Agent execution failed: {exc}")
+            self._persist_failure(
+                execution_id=execution_id, agent=agent, request=request,
+                created_at=created_at, error=failure,
+            )
+            raise failure from exc
         return AgentResponse(
             execution_id=execution_id, agent_id=agent.agent_id,
             status="completed", output=output, provider=self.provider.name,

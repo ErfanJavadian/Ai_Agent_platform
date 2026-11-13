@@ -2,7 +2,7 @@
 
 An extensible, execution-oriented multi-agent organization and AI Company Builder.
 
-> Status: Phase 1.6. The runtime can now pass approved workspace tools to a compatible model, execute selected tool calls, return results, and continue within bounded limits.
+> Status: Phase 1.7 implementation. In addition to the bounded model/tool loop, failed executions are persisted in SQLite with a bounded error summary. Local verification of Phase 1.7 is pending.
 
 ## Architecture documents
 - [Product vision](docs/PRODUCT_VISION.md)
@@ -27,7 +27,7 @@ An extensible, execution-oriented multi-agent organization and AI Company Builde
 - Model-controlled function/tool call parsing and bounded tool/result loop.
 - Permission-aware tool registry and gateway.
 - Workspace file creation, reading, exact-match editing, and listing.
-- SQLite execution history and tool-call audit records.
+- SQLite execution history, failed-run records, and tool-call audit records (including a non-destructive schema migration).
 - CLI application entry point and automated tests.
 
 ## Local setup

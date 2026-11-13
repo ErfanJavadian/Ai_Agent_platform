@@ -38,8 +38,14 @@
 - Runtime executes model-selected tools through the permission gateway, returns tool results, and continues for a bounded number of turns.
 - Workspace tools are composed into application instances; per-agent workspaces default to data/workspaces/<agent_id>.
 - Added a builder agent example and scripted offline loop tests.
-- Automated tests added; local Android/Termux verification is pending.
+- Android/Termux verification: **39 tests passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 1.32 seconds).
 - See docs/PHASE_1_6_MODEL_TOOL_LOOP.md.
+
+### Phase 1.7 — Execution Failure Persistence
+- Runtime now writes failed execution records for provider/runtime errors and tool-loop exhaustion.
+- SQLite executions include a bounded error summary; existing databases gain the new nullable column through a non-destructive migration.
+- Automated tests added for provider failure persistence, tool-loop limit persistence, and migration without data loss.
+- Local Android/Termux verification is pending.
 
 ## Explicit limitations
 - No live model API request has yet been verified.
@@ -54,8 +60,9 @@
 - Phase 1.3: **20 passed, 0 failed**.
 - Phase 1.4: **22 passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 0.55 seconds).
 - Phase 1.5: **33 passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 1.81 seconds).
-- Phase 1.6: tests added; local verification pending.
+- Phase 1.6: **39 passed, 0 failed** (Python 3.13.13, pytest 9.2.0; 1.32 seconds).
+- Phase 1.7: implementation and tests added; local verification pending.
 - Never commit or share real API credentials.
 
 ## Next milestone
-Verify Phase 1.6 locally, then conduct a controlled live-provider smoke test if the user has a compatible API endpoint and credentials. Improve execution failure persistence and workspace isolation before expanding tool capabilities. Do not add arbitrary host shell execution.
+Verify Phase 1.7 locally on Android/Termux. Then review workspace isolation and failure behavior before adding broader tools. A live-provider smoke test remains optional and requires a user-supplied compatible endpoint and credentials. Do not add arbitrary host shell execution.

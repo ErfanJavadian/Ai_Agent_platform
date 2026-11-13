@@ -33,9 +33,16 @@ class SQLiteExecutionStore:
                     provider TEXT NOT NULL,
                     task TEXT NOT NULL,
                     output TEXT NOT NULL,
-                    created_at TEXT NOT NULL
+                    created_at TEXT NOT NULL,
+                    error TEXT
                 )
             """)
+            columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(executions)").fetchall()
+            }
+            if "error" not in columns:
+                connection.execute("ALTER TABLE executions ADD COLUMN error TEXT")
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS tool_calls (
                     call_id TEXT PRIMARY KEY,
@@ -55,13 +62,16 @@ class SQLiteExecutionStore:
             )
 
     def save(self, *, execution_id: str, agent_id: str, status: str,
-             provider: str, task: str, output: str, created_at: str) -> None:
+             provider: str, task: str, output: str, created_at: str,
+             error: str | None = None) -> None:
         with self._connect() as connection:
             connection.execute("""
                 INSERT INTO executions
-                (execution_id, agent_id, status, provider, task, output, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (execution_id, agent_id, status, provider, task, output, created_at))
+                (execution_id, agent_id, status, provider, task, output, created_at, error)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                execution_id, agent_id, status, provider, task, output, created_at, error,
+            ))
 
     def get(self, execution_id: str) -> dict[str, Any] | None:
         with self._connect() as connection:
