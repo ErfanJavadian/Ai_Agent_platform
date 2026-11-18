@@ -51,3 +51,10 @@ python -m ai_agent_platform run --agent examples/agents/builder.json --task "Cre
 Configure `AI_AGENT_PROVIDER=openai_compatible`, `AI_AGENT_API_KEY`, and `AI_AGENT_MODEL` in the local shell before the real-model example. Do not commit API keys.
 
 No arbitrary shell execution or external side effects are enabled. The workspace path boundary is not a hardened OS sandbox. No software license has been selected.
+
+
+## Personal chatbot
+
+A Persian-first interactive assistant is included. See [Personal Chatbot setup and usage](docs/PERSONAL_CHATBOT.md).
+
+Start it with `ai-agent chat` after configuring an OpenAI-compatible provider. Conversation history stays in memory and is not persisted.
