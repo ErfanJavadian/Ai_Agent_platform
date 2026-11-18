@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827"><title>Erfan Personal AI</title>
+<style>
+:root{color-scheme:dark;font-family:Tahoma,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#eef2ff;min-height:100vh;display:flex;justify-content:center}.app{width:min(100%,760px);height:100dvh;display:flex;flex-direction:column;background:#111b2d}.top{padding:18px 16px;border-bottom:1px solid #29364b}.top h1{font-size:19px;margin:0 0 6px}.top p{margin:0;color:#aab7cc;font-size:12px}.messages{flex:1;overflow:auto;padding:18px 14px;display:flex;flex-direction:column;gap:12px}.bubble{max-width:88%;padding:12px 14px;border-radius:16px;white-space:pre-wrap;line-height:1.9;overflow-wrap:anywhere}.user{align-self:flex-start;background:#254c83}.assistant{align-self:flex-end;background:#202d42}.welcome{color:#b9c6d9;text-align:center;margin:auto;line-height:2}.composer{padding:12px;display:flex;gap:8px;border-top:1px solid #29364b;padding-bottom:max(12px,env(safe-area-inset-bottom))}.composer textarea{flex:1;resize:none;min-height:48px;max-height:130px;border:1px solid #40516b;border-radius:13px;background:#0c1525;color:white;padding:12px;font:inherit;outline:none}.composer button,.primary{border:0;border-radius:12px;background:#3478d4;color:white;padding:0 18px;font:inherit}.composer button:disabled{opacity:.5}.login{padding:20px;display:flex;gap:8px}.login input{flex:1;min-width:0;padding:12px;border-radius:10px;border:1px solid #40516b;background:#0c1525;color:white;font:inherit}.login button{padding:0 16px}.hidden{display:none!important}.hint{font-size:11px;color:#8fa1ba;text-align:center;padding:0 8px 8px}
+</style></head>
+<body><main class="app"><header class="top"><h1>Erfan Personal AI</h1><p>دستیار شخصی هوشمند · فارسی‌محور</p></header>
+<section id="login" class="login"><input id="password" type="password" autocomplete="current-password" placeholder="رمز ورود اختصاصی"><button id="loginBtn" class="primary">ورود</button></section>
+<section id="messages" class="messages hidden"><div class="welcome">سلام! من دستیار هوشمند شخصی تو هستم.<br>هر سوال یا کاری داری، همین‌جا بنویس.</div></section>
+<div id="composer" class="composer hidden"><textarea id="input" rows="1" placeholder="پیامت را بنویس..."></textarea><button id="send">ارسال</button></div><div class="hint">گفتگو فقط در حافظه همین صفحه نگهداری می‌شود.</div></main>
+<script>
+const $=id=>document.getElementById(id);let token=sessionStorage.getItem("assistant_token")||"",history=[];
+function showChat(){ $("login").classList.add("hidden");$("messages").classList.remove("hidden");$("composer").classList.remove("hidden");}
+if(token)showChat();
+$("loginBtn").onclick=()=>{token=$("password").value.trim();if(token.length<16){alert("رمز ورود باید حداقل ۱۶ کاراکتر باشد.");return}sessionStorage.setItem("assistant_token",token);showChat();};
+function add(text,role){const empty=$("messages").querySelector(".welcome");if(empty)empty.remove();const div=document.createElement("div");div.className="bubble "+role;div.textContent=text;$("messages").appendChild(div);$("messages").scrollTop=$("messages").scrollHeight;return div;}
+async function send(){const text=$("input").value.trim();if(!text)return;if(text.length>5000){alert("حداکثر طول پیام ۵۰۰۰ نویسه است.");return}$("input").value="";add(text,"user");history.push({role:"user",content:text});history=history.slice(-20);const pending=add("در حال فکر کردن…","assistant");$("send").disabled=true;try{const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({messages:history})});const data=await res.json();if(res.status===401){sessionStorage.removeItem("assistant_token");token="";location.reload();return}if(!res.ok)throw new Error(data.error||"خطا در دریافت پاسخ");pending.textContent=data.reply;history.push({role:"assistant",content:data.reply});}catch(e){pending.textContent="خطا: "+e.message;history.pop();}finally{$("send").disabled=false;$("input").focus();}}
+$("send").onclick=send;$("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}});
+</script></body></html>
