@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: erfan-personal-ai
+    runtime: python
+    plan: free
+    buildCommand: pip install .
+    startCommand: PYTHONPATH=src python -m webapp.server
+    healthCheckPath: /
+    envVars:
+      - key: AI_AGENT_PROVIDER
+        value: openai_compatible
+      - key: AI_AGENT_API_KEY
+        sync: false
+      - key: AI_AGENT_MODEL
+        sync: false
+      - key: APP_ACCESS_PASSWORD
+        generateValue: true
